@@ -110,3 +110,4 @@ sql, err := builder.Update("table").
 bindPars := builder.GetParams()
 ```
 
+> Where can be used in any combination as in the select SQL shown, for update and delete SQLs as well.
