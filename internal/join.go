@@ -1,6 +1,8 @@
 package builder
 
-import "strings"
+import (
+	"strings"
+)
 
 type Joiner interface {
 }

@@ -72,7 +72,7 @@ func (t *TestSuite) TestSimpleInsert() {
 
 	t.Nil(err)
 
-	t.Equal(sql, "INSERT INTO `table` `f1`,`f2` VALUES (?,?)")
+	t.Equal(sql, "INSERT INTO `table` (`f1`,`f2`) VALUES (?,?)")
 	pars := builder.GetParams()
 	t.Len(pars, 2)
 }

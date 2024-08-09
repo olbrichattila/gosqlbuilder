@@ -27,7 +27,7 @@ func (b *Build) generateInsertSQL() (string, error) {
 	builderConcat(
 		builder,
 		"INSERT INTO ", b.fieldQuote, b.tableName, b.fieldQuote,
-		" ", b.getSelectFields(),
+		" (", b.getSelectFields(), ")",
 		" VALUES (?",
 		strings.Repeat(",?", valueCount-1),
 		")",

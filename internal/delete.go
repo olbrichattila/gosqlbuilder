@@ -1,6 +1,8 @@
 package builder
 
-import "strings"
+import (
+	"strings"
+)
 
 func (b *Build) Delete(tableName string) Builder {
 	b.reset()

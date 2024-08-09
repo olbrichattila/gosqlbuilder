@@ -15,15 +15,6 @@ const (
 	joinTypeRight = "RIGHT JOIN"
 )
 
-// New creates new SQL builder
-func New() Builder {
-	return &Build{
-		fieldQuote: "`",
-		where:      NewBlankWhere(),
-		joins:      make([]*Join, 0),
-	}
-}
-
 type Builder interface {
 	Where(field, relation string, value interface{}) Builder
 	OrWhere(field, relation string, value interface{}) Builder
@@ -46,6 +37,15 @@ type Builder interface {
 	Limit(l int) Builder
 	Offset(o int) Builder
 	Update(tableName string) Builder
+}
+
+// New creates new SQL builder
+func New() Builder {
+	return &Build{
+		fieldQuote: "`",
+		where:      NewBlankWhere(),
+		joins:      make([]*Join, 0),
+	}
 }
 
 // The Builder struct holding the builder logic
