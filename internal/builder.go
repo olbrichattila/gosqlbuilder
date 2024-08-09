@@ -82,9 +82,14 @@ func (b *Build) AsSQL() (string, error) {
 func (b *Build) reset() {
 	b.tableName = ""
 	b.fields = make([]string, 0)
+	b.values = make([]interface{}, 0)
 	b.groupBy = make([]string, 0)
 	b.orderBy = make([]string, 0)
 	b.values = make([]interface{}, 0)
+	b.where = NewBlankWhere()
+	b.limit = 0
+	b.offset = 0
+	b.joins = make([]*Join, 0)
 }
 
 func (b *Build) GetParams() []interface{} {
