@@ -7,3 +7,12 @@ func builderConcat(strBuilder *strings.Builder, pars ...string) {
 		strBuilder.WriteString(par)
 	}
 }
+
+func validateRelation(relation string) bool {
+	switch relation {
+	case "=", ">", "<", ">=", "<=", "<>", "!=":
+		return true
+	default:
+		return false
+	}
+}

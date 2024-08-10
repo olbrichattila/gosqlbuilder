@@ -54,7 +54,7 @@ func (b *Build) generateSelectSQL() (string, error) {
 
 	builderConcat(
 		builder,
-		" WHERE ", b.generateWhere(b.where),
+		" ", tokenWhere, " ", b.generateWhere(b.where),
 	)
 
 	groupBySQL := b.getGroupBy()

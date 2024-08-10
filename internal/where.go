@@ -1,10 +1,15 @@
 package builder
 
+import "fmt"
+
 const (
-	typeAnd       = 0
-	typeOr        = 1
-	typeBetween   = 2
-	typeOrBetween = 3
+	typeAnd                           = 0
+	typeOr                            = 1
+	typeBetween                       = 2
+	typeOrBetween                     = 3
+	tokenWhere                        = "WHERE"
+	tokenOn                           = "ON"
+	incorrectRelationshipPanicMessage = "provided relation %s is not valid"
 )
 
 // NewBlankWhere initiates a Where interface object with default values
@@ -19,6 +24,10 @@ func NewWhere(
 	relation string,
 	value interface{},
 ) Where {
+	if !validateRelation(relation) {
+		panic(fmt.Sprintf(incorrectRelationshipPanicMessage, relation))
+	}
+
 	return &Wh{
 		operator: operator,
 		field:    field,
@@ -83,6 +92,10 @@ type Wh struct {
 
 // Where creates SQL WHERE block
 func (w *Wh) Where(field, relation string, value interface{}) Where {
+	if !validateRelation(relation) {
+		panic(fmt.Sprintf(incorrectRelationshipPanicMessage, relation))
+	}
+
 	w.items = append(w.items, &Wh{
 		field:    field,
 		relation: relation,
@@ -94,6 +107,10 @@ func (w *Wh) Where(field, relation string, value interface{}) Where {
 
 // OrWhere creates SQL OrWhere block
 func (w *Wh) OrWhere(field, relation string, value interface{}) Where {
+	if !validateRelation(relation) {
+		panic(fmt.Sprintf(incorrectRelationshipPanicMessage, relation))
+	}
+
 	w.items = append(w.items, &Wh{
 		field:    field,
 		relation: relation,

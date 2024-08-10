@@ -4,6 +4,11 @@ import (
 	"strings"
 )
 
+const (
+	operatorAnd = "AND"
+	operatorOr  = "OR"
+)
+
 // Where creates SQL WHERE block
 func (b *Build) Where(field, relation string, value interface{}) Builder {
 	b.where.AppendItem(
@@ -101,11 +106,11 @@ func (b *Build) generateWhere(w Where) string {
 func (b *Build) getWhereOperator(t int) string {
 	switch t {
 	case typeAnd, typeBetween:
-		return "AND"
+		return operatorAnd
 	case typeOr, typeOrBetween:
-		return "OR"
+		return operatorOr
 	default:
-		return "AND"
+		return operatorAnd
 	}
 }
 

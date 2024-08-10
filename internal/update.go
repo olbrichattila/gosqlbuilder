@@ -16,7 +16,7 @@ func (b *Build) Update(tableName string) Builder {
 func (b *Build) generateUpdateSQL() (string, error) {
 	valueCount := len(b.values)
 	if len(b.fields) != valueCount {
-		return "", fmt.Errorf("select filed and value count does not match")
+		return "", errFieldCountMismatch
 	}
 
 	if valueCount == 0 {
@@ -42,7 +42,7 @@ func (b *Build) generateUpdateSQL() (string, error) {
 
 	builderConcat(
 		builder,
-		" WHERE ", b.generateWhere(b.where),
+		" ", tokenWhere, " ", b.generateWhere(b.where),
 	)
 
 	return builder.String(), nil

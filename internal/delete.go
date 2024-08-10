@@ -21,7 +21,7 @@ func (b *Build) generateDeleteSQL() (string, error) {
 
 	builderConcat(
 		builder,
-		" WHERE ", b.generateWhere(b.where),
+		" ", tokenWhere, " ", b.generateWhere(b.where),
 	)
 
 	return builder.String(), nil
