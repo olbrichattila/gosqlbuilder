@@ -135,7 +135,7 @@ func (w *Wh) WhereGroup(fn WhereGroupFunc) Where {
 	return w
 }
 
-// OrWhere creates a new groups of WHERE preceded by OR operator, like WHERE `field` = ? and (`field2` = ?....). Provide the conditions in the closure where you get a Where builder
+// OrWhereGroup creates a new groups of WHERE preceded by OR operator, like WHERE `field` = ? and (`field2` = ?....). Provide the conditions in the closure where you get a Where builder
 func (w *Wh) OrWhereGroup(fn WhereGroupFunc) Where {
 	where := &Wh{operator: typeOr}
 
@@ -155,7 +155,7 @@ func (w *Wh) GetOperator() int {
 	return w.operator
 }
 
-// GetFields returns the database field name set for this WHERE clause
+// GetField returns the database field name set for this WHERE clause
 func (w *Wh) GetField() string {
 	return w.field
 }

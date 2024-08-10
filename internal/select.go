@@ -65,11 +65,11 @@ func (b *Build) generateSelectSQL() (string, error) {
 		)
 	}
 
-	orderBySql := b.getOrderBy()
-	if orderBySql != "" {
+	orderBySQL := b.getOrderBy()
+	if orderBySQL != "" {
 		builderConcat(
 			builder,
-			" ORDER BY ", orderBySql,
+			" ORDER BY ", orderBySQL,
 		)
 	}
 

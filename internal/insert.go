@@ -13,6 +13,18 @@ func (b *Build) Insert(tableName string) Builder {
 	return b
 }
 
+// Fields add fields for insert into or other SQL types
+func (b *Build) Fields(fields ...string) Builder {
+	b.fields = fields
+	return b
+}
+
+// Values are adding the binding values for Fields
+func (b *Build) Values(values ...interface{}) Builder {
+	b.values = values
+	return b
+}
+
 func (b *Build) generateInsertSQL() (string, error) {
 	valueCount := len(b.values)
 	if len(b.fields) != valueCount {
@@ -35,14 +47,4 @@ func (b *Build) generateInsertSQL() (string, error) {
 	)
 
 	return builder.String(), nil
-}
-
-func (b *Build) Fields(fields ...string) Builder {
-	b.fields = fields
-	return b
-}
-
-func (b *Build) Values(values ...interface{}) Builder {
-	b.values = values
-	return b
 }

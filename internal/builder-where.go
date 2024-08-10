@@ -47,7 +47,7 @@ func (b *Build) WhereGroup(fn WhereGroupFunc) Builder {
 	return b
 }
 
-// OrWhere creates a new groups of WHERE preceded by OR operator, like WHERE `field` = ? and (`field2` = ?....). Provide the conditions in the closure where you get a Where builder
+// OrWhereGroup creates a new groups of WHERE preceded by OR operator, like WHERE `field` = ? and (`field2` = ?....). Provide the conditions in the closure where you get a Where builder
 func (b *Build) OrWhereGroup(fn WhereGroupFunc) Builder {
 	where := NewWhereGroup(typeOr)
 	b.where.AppendItem(where)

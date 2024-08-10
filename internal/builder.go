@@ -49,7 +49,7 @@ func New() Builder {
 	}
 }
 
-// The Builder struct holding the builder logic
+// The Build struct holding the builder logic
 type Build struct {
 	sQLType    int
 	tableName  string
@@ -93,6 +93,7 @@ func (b *Build) reset() {
 	b.joins = make([]*Join, 0)
 }
 
+// GetParams returns the binding params for the last generated SQL
 func (b *Build) GetParams() []interface{} {
 	switch b.sQLType {
 	case typeSelect:
