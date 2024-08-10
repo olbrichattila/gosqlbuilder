@@ -2,7 +2,7 @@
 package sqlbuilder
 
 import (
-	builder "github.com/olbrichattila/gosqlbuilder/internal"
+	builder "github.com/olbrichattila/gosqlbuilder/pkg"
 )
 
 // New creates New SQL builder instance
