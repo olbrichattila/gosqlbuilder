@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Select initiates a Select SQL statement like 'SELECT <fieldlist> FROM'
 func (b *Build) Select(tableName string) Builder {
 	b.reset()
 	b.tableName = tableName
@@ -12,21 +13,25 @@ func (b *Build) Select(tableName string) Builder {
 	return b
 }
 
+// GroupBy adds a SQL GROUP BY clause
 func (b *Build) GroupBy(fields ...string) Builder {
 	b.groupBy = fields
 	return b
 }
 
+// OrderBy adds a SQL ORDER BY clause
 func (b *Build) OrderBy(fields ...string) Builder {
 	b.orderBy = fields
 	return b
 }
 
+// Limit adds a LIMIT x clause
 func (b *Build) Limit(l int) Builder {
 	b.limit = l
 	return b
 }
 
+// Offset adds an SQL OFFSET clause
 func (b *Build) Offset(o int) Builder {
 	b.offset = o
 	return b
@@ -52,11 +57,11 @@ func (b *Build) generateSelectSQL() (string, error) {
 		" WHERE ", b.generateWhere(b.where),
 	)
 
-	groupBySql := b.getGroupBy()
-	if groupBySql != "" {
+	groupBySQL := b.getGroupBy()
+	if groupBySQL != "" {
 		builderConcat(
 			builder,
-			" GROUP BY ", groupBySql,
+			" GROUP BY ", groupBySQL,
 		)
 	}
 

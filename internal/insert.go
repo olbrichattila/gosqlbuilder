@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Insert initiates a new INSERT INTO SQL
 func (b *Build) Insert(tableName string) Builder {
 	b.reset()
 	b.tableName = tableName

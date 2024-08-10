@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// Update initiates an SQL UPDATE statement
 func (b *Build) Update(tableName string) Builder {
 	b.reset()
 	b.tableName = tableName

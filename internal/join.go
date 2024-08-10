@@ -15,14 +15,17 @@ type Join struct {
 	where     Where
 }
 
+// Join creates a table join clause, like JOIN `table1` ON `table1.id` = `table2.table1_id`
 func (b *Build) Join(tableName, leftCond, rightCond string, fn WhereGroupFunc) Builder {
 	return b.getJoinBuilder(joinTypeInner, tableName, leftCond, rightCond, fn)
 }
 
+// Join creates a table left join clause, like LEFT JOIN `table1` ON `table1.id` = `table2.table1_id`
 func (b *Build) LeftJoin(tableName, leftCond, rightCond string, fn WhereGroupFunc) Builder {
 	return b.getJoinBuilder(joinTypeLeft, tableName, leftCond, rightCond, fn)
 }
 
+// Join creates a table right join clause, like RIGHT JOIN `table1` ON `table1.id` = `table2.table1_id`
 func (b *Build) RightJoin(tableName, leftCond, rightCond string, fn WhereGroupFunc) Builder {
 	return b.getJoinBuilder(joinTypeRight, tableName, leftCond, rightCond, fn)
 }

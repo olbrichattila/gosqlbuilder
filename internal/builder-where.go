@@ -4,6 +4,59 @@ import (
 	"strings"
 )
 
+// Where creates SQL WHERE block
+func (b *Build) Where(field, relation string, value interface{}) Builder {
+	b.where.AppendItem(
+		NewWhere(typeAnd, field, relation, value),
+	)
+
+	return b
+}
+
+// OrWhere creates SQL OrWhere block
+func (b *Build) OrWhere(field, relation string, value interface{}) Builder {
+	b.where.AppendItem(NewWhere(typeOr, field, relation, value))
+
+	return b
+}
+
+// Between creates SQL BETWEEN condition
+func (b *Build) Between(field string, value1, value2 interface{}) Builder {
+	b.where.AppendItem(
+		NewBetween(typeBetween, field, value1, value2),
+	)
+
+	return b
+}
+
+// OrBetween creates SQL BETWEEN with preceding OR operator
+func (b *Build) OrBetween(field string, value1, value2 interface{}) Builder {
+	b.where.AppendItem(
+		NewBetween(typeOrBetween, field, value1, value2),
+	)
+
+	return b
+}
+
+// WhereGroup creates a new groups of WHERE, lile WHERE `field` = ? and (`field2` = ?....). Provide the conditions in the closure where you get a Where builder
+func (b *Build) WhereGroup(fn WhereGroupFunc) Builder {
+	where := NewWhereGroup(typeAnd)
+	b.where.AppendItem(where)
+	fn(where)
+
+	return b
+}
+
+// OrWhere creates a new groups of WHERE preceded by OR operator, like WHERE `field` = ? and (`field2` = ?....). Provide the conditions in the closure where you get a Where builder
+func (b *Build) OrWhereGroup(fn WhereGroupFunc) Builder {
+	where := NewWhereGroup(typeOr)
+	b.where.AppendItem(where)
+
+	fn(where)
+
+	return b
+}
+
 func (b *Build) generateWhere(w Where) string {
 	strBuilder := &strings.Builder{}
 	isFirst := true
@@ -71,51 +124,4 @@ func (b *Build) getWhereParams(w Where) []interface{} {
 	}
 
 	return pars
-}
-
-func (b *Build) Where(field, relation string, value interface{}) Builder {
-	b.where.AppendItem(
-		NewWhere(typeAnd, field, relation, value),
-	)
-
-	return b
-}
-
-func (b *Build) OrWhere(field, relation string, value interface{}) Builder {
-	b.where.AppendItem(NewWhere(typeOr, field, relation, value))
-
-	return b
-}
-
-func (b *Build) Between(field string, value1, value2 interface{}) Builder {
-	b.where.AppendItem(
-		NewBetween(typeBetween, field, value1, value2),
-	)
-
-	return b
-}
-
-func (b *Build) OrBetween(field string, value1, value2 interface{}) Builder {
-	b.where.AppendItem(
-		NewBetween(typeOrBetween, field, value1, value2),
-	)
-
-	return b
-}
-
-func (b *Build) WhereGroup(fn WhereGroupFunc) Builder {
-	where := NewWhereGroup(typeAnd)
-	b.where.AppendItem(where)
-	fn(where)
-
-	return b
-}
-
-func (b *Build) OrWhereGroup(fn WhereGroupFunc) Builder {
-	where := NewWhereGroup(typeOr)
-	b.where.AppendItem(where)
-
-	fn(where)
-
-	return b
 }

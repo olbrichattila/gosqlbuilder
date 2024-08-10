@@ -15,6 +15,7 @@ const (
 	joinTypeRight = "RIGHT JOIN"
 )
 
+// Builder is the base SQL builder interface
 type Builder interface {
 	Where(field, relation string, value interface{}) Builder
 	OrWhere(field, relation string, value interface{}) Builder

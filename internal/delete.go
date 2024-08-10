@@ -4,6 +4,7 @@ import (
 	"strings"
 )
 
+// Delete initiates a DELETE FROM SQL
 func (b *Build) Delete(tableName string) Builder {
 	b.reset()
 	b.tableName = tableName

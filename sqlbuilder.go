@@ -5,6 +5,7 @@ import (
 	builder "github.com/olbrichattila/gosqlbuilder/internal"
 )
 
+// New creates New SQL builder instance
 func New() builder.Builder {
 	return builder.New()
 }
