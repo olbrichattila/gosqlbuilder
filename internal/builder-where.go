@@ -62,6 +62,70 @@ func (b *Build) OrWhereGroup(fn WhereGroupFunc) Builder {
 	return b
 }
 
+// IsNull crete IS NULL SQL clause
+func (b *Build) IsNull(fieldName string) Builder {
+	where := NewIsNull(fieldName)
+	b.where.AppendItem(where)
+
+	return b
+}
+
+// IsNotNull crete IS NOT NULL SQL clause
+func (b *Build) IsNotNull(fieldName string) Builder {
+	where := NewIsNotNull(fieldName)
+	b.where.AppendItem(where)
+
+	return b
+}
+
+// OrIsNull crete OR IS NULL SQL clause
+func (b *Build) OrIsNull(fieldName string) Builder {
+	where := NewOrIsNull(fieldName)
+	b.where.AppendItem(where)
+
+	return b
+}
+
+// OrIsNotNull crete OR IS NOT NULL SQL clause
+func (b *Build) OrIsNotNull(fieldName string) Builder {
+	where := NewOrIsNotNull(fieldName)
+	b.where.AppendItem(where)
+
+	return b
+}
+
+// In creates SQL IN (?,?)
+func (b *Build) In(fieldName string, pars ...interface{}) Builder {
+	where := NewIn(fieldName, pars...)
+	b.where.AppendItem(where)
+
+	return b
+}
+
+// NotIn creates SQL NOT IN (?,?)
+func (b *Build) NotIn(fieldName string, pars ...interface{}) Builder {
+	where := NewNotIn(fieldName, pars...)
+	b.where.AppendItem(where)
+
+	return b
+}
+
+// OrIn creates SQL OR IN (?,?)
+func (b *Build) OrIn(fieldName string, pars ...interface{}) Builder {
+	where := NewOrIn(fieldName, pars...)
+	b.where.AppendItem(where)
+
+	return b
+}
+
+// OrNotIn creates SQL OR NOT IN (?,?)
+func (b *Build) OrNotIn(fieldName string, pars ...interface{}) Builder {
+	where := NewOrNotIn(fieldName, pars...)
+	b.where.AppendItem(where)
+
+	return b
+}
+
 func (b *Build) generateWhere(w Where) string {
 	strBuilder := &strings.Builder{}
 	isFirst := true
@@ -89,9 +153,24 @@ func (b *Build) generateWhere(w Where) string {
 				b.fieldQuote, item.GetField(), b.fieldQuote,
 			)
 
-			if item.GetOperator() == typeBetween || item.GetOperator() == typeOrBetween {
+			switch item.GetOperator() {
+			case typeBetween, typeOrBetween:
 				strBuilder.WriteString(" BETWEEN ? AND ? ")
-			} else {
+			case typeIsNull, typeOrIsNull:
+				strBuilder.WriteString(" IS NULL")
+			case typeIsNotNull, typeOrIsNotNull:
+				strBuilder.WriteString(" IS NOT NULL")
+			case typeIn, typeOrIn:
+				builderConcat(
+					strBuilder,
+					" IN (?", strings.Repeat(",?", len(item.GetInValues())-1), ") ",
+				)
+			case typeNotIn, typeOrNotIn:
+				builderConcat(
+					strBuilder,
+					" NOT IN (?", strings.Repeat(",?", len(item.GetInValues())-1), ") ",
+				)
+			default:
 				builderConcat(
 					strBuilder,
 					item.GetRelation(), "?",
@@ -107,7 +186,7 @@ func (b *Build) getWhereOperator(t int) string {
 	switch t {
 	case typeAnd, typeBetween:
 		return operatorAnd
-	case typeOr, typeOrBetween:
+	case typeOr, typeOrBetween, typeOrIsNotNull, typeOrIsNull, typeOrIn, typeOrNotIn:
 		return operatorOr
 	default:
 		return operatorAnd
@@ -121,9 +200,15 @@ func (b *Build) getWhereParams(w Where) []interface{} {
 		if item.GetItems() != nil {
 			pars = append(pars, b.getWhereParams(item)...)
 		} else {
-			pars = append(pars, item.GetValue())
-			if item.GetOperator() == typeBetween || item.GetOperator() == typeOrBetween {
-				pars = append(pars, item.GetValue2())
+			switch item.GetOperator() {
+			case typeIsNull, typeIsNotNull, typeOrIsNull, typeOrIsNotNull:
+				// do nothing, no parameter
+			case typeIn, typeNotIn, typeOrIn, typeOrNotIn:
+				pars = append(pars, item.GetInValues()...)
+			case typeBetween, typeOrBetween:
+				pars = append(pars, item.GetValue(), item.GetValue2())
+			default:
+				pars = append(pars, item.GetValue())
 			}
 		}
 	}

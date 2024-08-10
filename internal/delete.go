@@ -19,10 +19,13 @@ func (b *Build) generateDeleteSQL() (string, error) {
 		"DELETE FROM ", b.fieldQuote, b.tableName, b.fieldQuote,
 	)
 
-	builderConcat(
-		builder,
-		" ", tokenWhere, " ", b.generateWhere(b.where),
-	)
+	whereSQL := b.generateWhere(b.where)
+	if whereSQL != "" {
+		builderConcat(
+			builder,
+			" ", tokenWhere, " ", whereSQL,
+		)
+	}
 
 	return builder.String(), nil
 }

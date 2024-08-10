@@ -22,6 +22,14 @@ type Builder interface {
 	Between(field string, value1, value2 interface{}) Builder
 	OrBetween(field string, value1, value2 interface{}) Builder
 	WhereGroup(fn WhereGroupFunc) Builder
+	IsNull(string) Builder
+	IsNotNull(string) Builder
+	OrIsNull(string) Builder
+	OrIsNotNull(string) Builder
+	In(string, ...interface{}) Builder
+	NotIn(string, ...interface{}) Builder
+	OrIn(string, ...interface{}) Builder
+	OrNotIn(string, ...interface{}) Builder
 	OrWhereGroup(fn WhereGroupFunc) Builder
 	AsSQL() (string, error)
 	GetParams() []interface{}

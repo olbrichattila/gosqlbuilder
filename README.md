@@ -110,4 +110,163 @@ sql, err := builder.Update("table").
 bindPars := builder.GetParams()
 ```
 
+## Is null
+```
+builder := New()
+sql, err := builder.
+    Select("table1").
+    Where("field1", "=", 5).
+    IsNull("field2").
+    AsSQL()
+
+
+whereParams := builder.GetParams()
+```
+## Is not null
+```
+builder := New()
+sql, err := builder.
+    Select("table1").
+    Where("field1", "=", 5).
+    IsNotNull("field2").
+    AsSQL()
+
+t.Nil(err)
+t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND `field2` IS NOT NULL")
+
+whereParams := builder.GetParams()
+t.Len(whereParams, 1)
+```
+## Is null in where group
+```
+builder := New()
+sql, err := builder.
+    Select("table1").
+    Where("field1", "=", 5).
+    WhereGroup(func(w Where) {
+        w.IsNotNull("field2")
+        w.IsNotNull("field3")
+    }).
+    AsSQL()
+
+
+whereParams := builder.GetParams()
+```
+## Is not null
+```
+builder := New()
+sql, err := builder.
+    Select("table1").
+    Where("field1", "=", 5).
+    OrIsNull("field2").
+    AsSQL()
+
+whereParams := builder.GetParams()
+```
+## Is is not null
+```
+builder := New()
+sql, err := builder.
+    Select("table1").
+    Where("field1", "=", 5).
+    OrIsNotNull("field2").
+    AsSQL()
+
+t.Nil(err)
+t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? OR `field2` IS NOT NULL")
+
+whereParams := builder.GetParams()
+t.Len(whereParams, 1)
+```
+## Or is not null in where group
+```
+builder := New()
+sql, err := builder.
+    Select("table1").
+    Where("field1", "=", 5).
+    WhereGroup(func(w Where) {
+        w.OrIsNotNull("field2")
+        w.OrIsNotNull("field3")
+    }).
+    AsSQL()
+
+whereParams := builder.GetParams()
+```	
+## In
+```
+builder := New()
+sql, err := builder.
+    Select("table1").
+    Where("field1", "=", 5).
+    In("field2", 1, 2, 3).
+    AsSQL()
+
+
+whereParams := builder.GetParams()
+```
+## In in where grout
+```
+builder := New()
+sql, err := builder.
+    Select("table1").
+    Where("field1", "=", 5).
+    WhereGroup(func(w Where) {
+        w.In("field2", 5, 8)
+        w.In("field2", 3, 2)
+    }).
+    AsSQL()
+
+whereParams := builder.GetParams()
+```
+## Not in
+```
+builder := New()
+sql, err := builder.
+    Select("table1").
+    Where("field1", "=", 5).
+    NotIn("field2", 1, 2, 3).
+    AsSQL()
+
+whereParams := builder.GetParams()
+```
+## Not in in where group
+```
+builder := New()
+sql, err := builder.
+    Select("table1").
+    Where("field1", "=", 5).
+    WhereGroup(func(w Where) {
+        w.NotIn("field2", 5, 8)
+        w.NotIn("field2", 3, 2)
+    }).
+    AsSQL()
+
+whereParams := builder.GetParams()
+```
+## Or not in
+```
+builder := New()
+sql, err := builder.
+    Select("table1").
+    Where("field1", "=", 5).
+    OrNotIn("field2", 1, 2, 3).
+    AsSQL()
+
+whereParams := builder.GetParams()
+````
+## Or not in in where group
+```
+builder := New()
+sql, err := builder.
+    Select("table1").
+    Where("field1", "=", 5).
+    OrWhereGroup(func(w Where) {
+        w.OrNotIn("field2", 5, 8)
+        w.OrNotIn("field2", 3, 2)
+    }).
+    AsSQL()
+
+whereParams := builder.GetParams()
+```
+
 > Where can be used in any combination as in the select SQL shown, for update and delete SQLs as well.

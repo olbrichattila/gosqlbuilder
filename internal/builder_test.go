@@ -105,3 +105,198 @@ func (t *TestSuite) TestSimpleUpdate() {
 	pars := builder.GetParams()
 	t.Len(pars, 3)
 }
+
+func (t *TestSuite) TestIsNull() {
+	builder := New()
+	sql, err := builder.
+		Select("table1").
+		Where("field1", "=", 5).
+		IsNull("field2").
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND `field2` IS NULL")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 1)
+}
+
+func (t *TestSuite) TestIsNotNull() {
+	builder := New()
+	sql, err := builder.
+		Select("table1").
+		Where("field1", "=", 5).
+		IsNotNull("field2").
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND `field2` IS NOT NULL")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 1)
+}
+
+func (t *TestSuite) TestIsNullInWhereGroup() {
+	builder := New()
+	sql, err := builder.
+		Select("table1").
+		Where("field1", "=", 5).
+		WhereGroup(func(w Where) {
+			w.IsNotNull("field2")
+			w.IsNotNull("field3")
+		}).
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND (`field2` IS NOT NULL AND `field3` IS NOT NULL)")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 1)
+}
+
+func (t *TestSuite) TestOrIsNull() {
+	builder := New()
+	sql, err := builder.
+		Select("table1").
+		Where("field1", "=", 5).
+		OrIsNull("field2").
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? OR `field2` IS NULL")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 1)
+}
+
+func (t *TestSuite) TestOrIsNotNull() {
+	builder := New()
+	sql, err := builder.
+		Select("table1").
+		Where("field1", "=", 5).
+		OrIsNotNull("field2").
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? OR `field2` IS NOT NULL")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 1)
+}
+
+func (t *TestSuite) TestOrIsNullInWhereGroup() {
+	builder := New()
+	sql, err := builder.
+		Select("table1").
+		Where("field1", "=", 5).
+		WhereGroup(func(w Where) {
+			w.OrIsNotNull("field2")
+			w.OrIsNotNull("field3")
+		}).
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND (`field2` IS NOT NULL OR `field3` IS NOT NULL)")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 1)
+}
+
+func (t *TestSuite) TestIn() {
+	builder := New()
+	sql, err := builder.
+		Select("table1").
+		Where("field1", "=", 5).
+		In("field2", 1, 2, 3).
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND `field2` IN (?,?,?) ")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 4)
+}
+
+func (t *TestSuite) TestInWhereGroup() {
+	builder := New()
+	sql, err := builder.
+		Select("table1").
+		Where("field1", "=", 5).
+		WhereGroup(func(w Where) {
+			w.In("field2", 5, 8)
+			w.In("field2", 3, 2)
+		}).
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND (`field2` IN (?,?)  AND `field2` IN (?,?) )")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 5)
+}
+
+func (t *TestSuite) TestNotIn() {
+	builder := New()
+	sql, err := builder.
+		Select("table1").
+		Where("field1", "=", 5).
+		NotIn("field2", 1, 2, 3).
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND `field2` NOT IN (?,?,?) ")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 4)
+}
+
+func (t *TestSuite) TestNotInWhereGroup() {
+	builder := New()
+	sql, err := builder.
+		Select("table1").
+		Where("field1", "=", 5).
+		WhereGroup(func(w Where) {
+			w.NotIn("field2", 5, 8)
+			w.NotIn("field2", 3, 2)
+		}).
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND (`field2` NOT IN (?,?)  AND `field2` NOT IN (?,?) )")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 5)
+}
+
+func (t *TestSuite) TestOrNotIn() {
+	builder := New()
+	sql, err := builder.
+		Select("table1").
+		Where("field1", "=", 5).
+		OrNotIn("field2", 1, 2, 3).
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? OR `field2` NOT IN (?,?,?) ")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 4)
+}
+
+func (t *TestSuite) TestOrNotInWhereGroup() {
+	builder := New()
+	sql, err := builder.
+		Select("table1").
+		Where("field1", "=", 5).
+		OrWhereGroup(func(w Where) {
+			w.OrNotIn("field2", 5, 8)
+			w.OrNotIn("field2", 3, 2)
+		}).
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? OR (`field2` NOT IN (?,?)  OR `field2` NOT IN (?,?) )")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 5)
+}

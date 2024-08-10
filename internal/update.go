@@ -40,10 +40,13 @@ func (b *Build) generateUpdateSQL() (string, error) {
 		)
 	}
 
-	builderConcat(
-		builder,
-		" ", tokenWhere, " ", b.generateWhere(b.where),
-	)
+	whereSQL := b.generateWhere(b.where)
+	if whereSQL != "" {
+		builderConcat(
+			builder,
+			" ", tokenWhere, " ", whereSQL,
+		)
+	}
 
 	return builder.String(), nil
 }

@@ -51,11 +51,13 @@ func (b *Build) generateSelectSQL() (string, error) {
 		builder,
 		b.generateJoins(),
 	)
-
-	builderConcat(
-		builder,
-		" ", tokenWhere, " ", b.generateWhere(b.where),
-	)
+	whereSQL := b.generateWhere(b.where)
+	if whereSQL != "" {
+		builderConcat(
+			builder,
+			" ", tokenWhere, " ", whereSQL,
+		)
+	}
 
 	groupBySQL := b.getGroupBy()
 	if groupBySQL != "" {
