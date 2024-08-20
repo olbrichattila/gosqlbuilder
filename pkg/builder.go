@@ -16,9 +16,13 @@ const (
 	joinTypeLeft  = "LEFT JOIN"
 	joinTypeRight = "RIGHT JOIN"
 
-	FlavourSqLite      = 1
-	FlavourMySQL       = 2
-	FlavourPgSQL       = 3
+	// FlavourSqLite sets SQLite quite and parameter binding type
+	FlavourSqLite = 1
+	// FlavourMySQL sets MySql quite and parameter binding type
+	FlavourMySQL = 2
+	// FlavourPgSQL sets Postgresql quite and parameter binding type
+	FlavourPgSQL = 3
+	// FlavourFirebirdSQL sets FirebirdSQL quite and parameter binding type
 	FlavourFirebirdSQL = 4
 )
 

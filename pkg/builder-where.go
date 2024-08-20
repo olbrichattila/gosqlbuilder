@@ -18,7 +18,7 @@ func (b *Build) Where(field, relation string, value interface{}) Builder {
 	return b
 }
 
-// Where creates SQL WHERE block
+// RawWhere creates SQL WHERE block
 func (b *Build) RawWhere(field, relation string, value interface{}) Builder {
 	b.where.AppendItem(
 		NewWhere(true, typeAnd, field, relation, value),
@@ -34,7 +34,7 @@ func (b *Build) OrWhere(field, relation string, value interface{}) Builder {
 	return b
 }
 
-// OrWhere creates SQL OrWhere block
+// RawOrWhere creates SQL OrWhere block
 func (b *Build) RawOrWhere(field, relation string, value interface{}) Builder {
 	b.where.AppendItem(NewWhere(true, typeOr, field, relation, value))
 

@@ -216,7 +216,7 @@ func (w *Wh) Where(field, relation string, value interface{}) Where {
 	return w
 }
 
-// Where creates SQL WHERE block
+// RaWWhere creates SQL WHERE block
 func (w *Wh) RaWWhere(field, relation string, value interface{}) Where {
 	if !validateRelation(relation) {
 		panic(fmt.Sprintf(incorrectRelationshipPanicMessage, relation))
