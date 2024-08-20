@@ -5,6 +5,20 @@ This is an experimental SQL builder component, work in progress, not fully teste
 
 ### Usage:
 
+## Supported SQL flavours: SqLite, MySql, PostgresQl, FirebirdSQL
+
+Setting flavour:
+```
+builder := New()
+builder.SetSQLFlavour(FlavourPgSQL)
+```
+
+Possible values:
+- FlavourSqLite
+- FlavourMySQL
+- FlavourPgSQL
+- FlavourFirebirdSQL
+
 ## Select
 This example is not a valid SQL, but shows all kind of combinations you can use in your select
 - Select("table_name")
