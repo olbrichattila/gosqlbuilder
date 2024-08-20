@@ -12,7 +12,16 @@ const (
 // Where creates SQL WHERE block
 func (b *Build) Where(field, relation string, value interface{}) Builder {
 	b.where.AppendItem(
-		NewWhere(typeAnd, field, relation, value),
+		NewWhere(false, typeAnd, field, relation, value),
+	)
+
+	return b
+}
+
+// Where creates SQL WHERE block
+func (b *Build) RawWhere(field, relation string, value interface{}) Builder {
+	b.where.AppendItem(
+		NewWhere(true, typeAnd, field, relation, value),
 	)
 
 	return b
@@ -20,7 +29,14 @@ func (b *Build) Where(field, relation string, value interface{}) Builder {
 
 // OrWhere creates SQL OrWhere block
 func (b *Build) OrWhere(field, relation string, value interface{}) Builder {
-	b.where.AppendItem(NewWhere(typeOr, field, relation, value))
+	b.where.AppendItem(NewWhere(false, typeOr, field, relation, value))
+
+	return b
+}
+
+// OrWhere creates SQL OrWhere block
+func (b *Build) RawOrWhere(field, relation string, value interface{}) Builder {
+	b.where.AppendItem(NewWhere(true, typeOr, field, relation, value))
 
 	return b
 }
@@ -148,14 +164,22 @@ func (b *Build) generateWhere(w Where) string {
 				)
 			}
 
-			builderConcat(
-				strBuilder,
-				b.fieldQuote, item.GetField(), b.fieldQuote,
-			)
+			if item.GetIsRaw() {
+				builderConcat(strBuilder, item.GetField())
+			} else {
+				builderConcat(
+					strBuilder,
+					b.fieldQuote, item.GetField(), b.fieldQuote,
+				)
+			}
 
 			switch item.GetOperator() {
 			case typeBetween, typeOrBetween:
-				strBuilder.WriteString(" BETWEEN ? AND ? ")
+				strBuilder.WriteString(" BETWEEN ")
+				strBuilder.WriteString(b.getBindingParameter())
+				strBuilder.WriteString(" AND ")
+				strBuilder.WriteString(b.getBindingParameter())
+				strBuilder.WriteString(" ")
 			case typeIsNull, typeOrIsNull:
 				strBuilder.WriteString(" IS NULL")
 			case typeIsNotNull, typeOrIsNotNull:
@@ -163,17 +187,17 @@ func (b *Build) generateWhere(w Where) string {
 			case typeIn, typeOrIn:
 				builderConcat(
 					strBuilder,
-					" IN (?", strings.Repeat(",?", len(item.GetInValues())-1), ") ",
+					" IN (", b.getBindingParameter(), strings.Repeat(","+b.getBindingParameter(), len(item.GetInValues())-1), ") ",
 				)
 			case typeNotIn, typeOrNotIn:
 				builderConcat(
 					strBuilder,
-					" NOT IN (?", strings.Repeat(",?", len(item.GetInValues())-1), ") ",
+					" NOT IN (", b.getBindingParameter(), strings.Repeat(","+b.getBindingParameter(), len(item.GetInValues())-1), ") ",
 				)
 			default:
 				builderConcat(
 					strBuilder,
-					item.GetRelation(), "?",
+					item.GetRelation(), b.getBindingParameter(),
 				)
 			}
 

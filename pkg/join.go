@@ -60,18 +60,11 @@ func (b *Build) generateJoin(j *Join) string {
 		" ", tokenOn, " ",
 		b.fieldQuote, j.leftCond, b.fieldQuote,
 		"=",
-		b.fieldQuote, j.leftCond, b.fieldQuote,
-		j.joinType,
+		b.fieldQuote, j.rightCond, b.fieldQuote,
 		" ",
-		b.fieldQuote, j.tableName, b.fieldQuote,
-		" ", tokenOn, " ",
-		b.fieldQuote, j.leftCond, b.fieldQuote,
-		"=",
-		b.fieldQuote, j.leftCond, b.fieldQuote,
 	)
 	if j.where != nil {
 		builderConcat(builder, " AND ", b.generateWhere(j.where))
-
 	}
 
 	return builder.String()

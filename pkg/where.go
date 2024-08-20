@@ -27,6 +27,7 @@ func NewBlankWhere() Where {
 
 // NewWhere initiates a Where interface object propagating values for SQL WHERE statement
 func NewWhere(
+	raw bool,
 	operator int,
 	field string,
 	relation string,
@@ -37,6 +38,7 @@ func NewWhere(
 	}
 
 	return &Wh{
+		raw:      raw,
 		operator: operator,
 		field:    field,
 		relation: relation,
@@ -182,11 +184,13 @@ type Where interface {
 	GetValue() interface{}
 	GetValue2() interface{}
 	GetInValues() []interface{}
+	GetIsRaw() bool
 	AppendItem(Where)
 }
 
 // Wh is the structure behind the Where builder
 type Wh struct {
+	raw      bool
 	operator int
 	field    string
 	relation string // TODO this could be a domain object verifying = <, > ...
@@ -203,6 +207,23 @@ func (w *Wh) Where(field, relation string, value interface{}) Where {
 	}
 
 	w.items = append(w.items, &Wh{
+		raw:      false,
+		field:    field,
+		relation: relation,
+		value:    value,
+		operator: typeAnd,
+	})
+	return w
+}
+
+// Where creates SQL WHERE block
+func (w *Wh) RaWWhere(field, relation string, value interface{}) Where {
+	if !validateRelation(relation) {
+		panic(fmt.Sprintf(incorrectRelationshipPanicMessage, relation))
+	}
+
+	w.items = append(w.items, &Wh{
+		raw:      true,
 		field:    field,
 		relation: relation,
 		value:    value,
@@ -370,4 +391,9 @@ func (w *Wh) GetInValues() []interface{} {
 // AppendItem add a new WHERE builder object to the multiple and recursive WHERE blocks
 func (w *Wh) AppendItem(wh Where) {
 	w.items = append(w.items, wh)
+}
+
+// GetIsRaw returns if the condition field  needs to be quoted
+func (w *Wh) GetIsRaw() bool {
+	return w.raw
 }

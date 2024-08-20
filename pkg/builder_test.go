@@ -24,13 +24,13 @@ func (t *TestSuite) TestComplexSelect() {
 			w.Where("join1", "=", "join2").
 				Where("join3", "=", "join4")
 		}).
-		LeftJoin("table1", "table1.id", "table2.table1_id", func(w Where) {
-			w.Where("join1", "=", "join2").
-				Where("join3", "=", "join4")
+		LeftJoin("table1l", "table1l.id", "table2l.table1_id", func(w Where) {
+			w.Where("join1l", "=", "join2l").
+				Where("join3l", "=", "join4l")
 		}).
-		RightJoin("table1", "table1.id", "table2.table1_id", func(w Where) {
-			w.Where("join1", "=", "join2").
-				Where("join3", "=", "join4")
+		RightJoin("table1r", "table1r.id", "table2r.table1_id", func(w Where) {
+			w.Where("join1r", "=", "join2r").
+				Where("join3r", "=", "join4r")
 		}).
 		Where("f1", "=", 1).
 		OrWhere("f2", "=", 2).
@@ -57,7 +57,7 @@ func (t *TestSuite) TestComplexSelect() {
 		AsSQL()
 
 	t.Nil(err)
-	t.Equal(sql, "SELECT `field1`,`field2` FROM `table1` JOIN `table2` ON `table1.id`=`table1.id`JOIN `table2` ON `table1.id`=`table1.id` AND `join1`=? AND `join3`=? LEFT JOIN `table1` ON `table1.id`=`table1.id`LEFT JOIN `table1` ON `table1.id`=`table1.id` AND `join1`=? AND `join3`=? RIGHT JOIN `table1` ON `table1.id`=`table1.id`RIGHT JOIN `table1` ON `table1.id`=`table1.id` AND `join1`=? AND `join3`=? WHERE `f1`=? OR `f2`=? AND `f3`=? AND (`sf4`=? AND `sf5`=? AND `btw` BETWEEN ? AND ?  AND (`ssf6`=? OR `ssf7`=? OR `ssf8`<=? OR (`ssssf9`=?))) AND `SL1`>? OR `orb` BETWEEN ? AND ?  GROUP BY `f1`,`f2`,`f3` ORDER BY `f5`,`f99`,`f44` LIMIT 10 OFFSET 100")
+	t.Equal(sql, "SELECT `field1`,`field2` FROM `table1` JOIN `table2` ON `table1.id`=`table2.table1_id`  AND `join1`=? AND `join3`=? LEFT JOIN `table1l` ON `table1l.id`=`table2l.table1_id`  AND `join1l`=? AND `join3l`=? RIGHT JOIN `table1r` ON `table1r.id`=`table2r.table1_id`  AND `join1r`=? AND `join3r`=? WHERE `f1`=? OR `f2`=? AND `f3`=? AND (`sf4`=? AND `sf5`=? AND `btw` BETWEEN ? AND ?  AND (`ssf6`=? OR `ssf7`=? OR `ssf8`<=? OR (`ssssf9`=?))) AND `SL1`>? OR `orb` BETWEEN ? AND ?  GROUP BY `f1`,`f2`,`f3` ORDER BY `f5`,`f99`,`f44` LIMIT 10 OFFSET 100")
 
 	whereParams := builder.GetParams()
 	t.Len(whereParams, 20)
@@ -296,6 +296,64 @@ func (t *TestSuite) TestOrNotInWhereGroup() {
 
 	t.Nil(err)
 	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? OR (`field2` NOT IN (?,?)  OR `field2` NOT IN (?,?) )")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 5)
+}
+
+func (t *TestSuite) TestPostgresFlavour() {
+	builder := New()
+	builder.SetSQLFlavour(FlavourPgSQL)
+	sql, err := builder.
+		Select("table1").
+		Where("field1", "=", 5).
+		OrWhereGroup(func(w Where) {
+			w.OrNotIn("field2", 5, 8)
+			w.OrNotIn("field2", 3, 2)
+		}).
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT * FROM \"table1\" WHERE \"field1\"=$1 OR (\"field2\" NOT IN ($2,$3)  OR \"field2\" NOT IN ($4,$5) )")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 5)
+}
+
+func (t *TestSuite) TestRawFields() {
+	builder := New()
+	sql, err := builder.
+		Select("table1").
+		RawFields("count(*) as cnt", "item_id").
+		Where("field1", "=", 5).
+		OrWhereGroup(func(w Where) {
+			w.OrNotIn("field2", 5, 8)
+			w.OrNotIn("field2", 3, 2)
+		}).
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT count(*) as cnt,item_id FROM `table1` WHERE `field1`=? OR (`field2` NOT IN (?,?)  OR `field2` NOT IN (?,?) )")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 5)
+}
+
+func (t *TestSuite) TestRawWhere() {
+	builder := New()
+	sql, err := builder.
+		Select("table1").
+		RawFields("count(*) as cnt", "item_id").
+		RawWhere("field1", "=", 5).
+		RawOrWhere("field2", "=", 5).
+		OrWhereGroup(func(w Where) {
+			w.OrNotIn("field3", 5, 8)
+			w.OrNotIn("field3", 3, 2)
+		}).
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "SELECT count(*) as cnt,item_id FROM `table1` WHERE field1=? OR field2=? OR (`field3` NOT IN (?,?)  OR `field3` NOT IN (?,?)")
 
 	whereParams := builder.GetParams()
 	t.Len(whereParams, 5)

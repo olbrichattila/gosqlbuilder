@@ -20,6 +20,14 @@ func (b *Build) Insert(tableName string) Builder {
 
 // Fields add fields for insert into or other SQL types
 func (b *Build) Fields(fields ...string) Builder {
+	b.fieldsAreRaw = false
+	b.fields = fields
+	return b
+}
+
+// Fields add fields for insert into or other SQL types
+func (b *Build) RawFields(fields ...string) Builder {
+	b.fieldsAreRaw = true
 	b.fields = fields
 	return b
 }
@@ -46,8 +54,8 @@ func (b *Build) generateInsertSQL() (string, error) {
 		builder,
 		"INSERT INTO ", b.fieldQuote, b.tableName, b.fieldQuote,
 		" (", b.getSelectFields(), ")",
-		" VALUES (?",
-		strings.Repeat(",?", valueCount-1),
+		" VALUES (", b.getBindingParameter(),
+		strings.Repeat(","+b.getBindingParameter(), valueCount-1),
 		")",
 	)
 

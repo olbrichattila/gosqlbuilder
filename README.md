@@ -204,7 +204,7 @@ sql, err := builder.
 
 whereParams := builder.GetParams()
 ```
-## In in where grout
+## In in where group
 ```
 builder := New()
 sql, err := builder.
@@ -267,6 +267,20 @@ sql, err := builder.
     AsSQL()
 
 whereParams := builder.GetParams()
+```
+
+## Raw select, where and orWhere (fields ar not quoted, so functions can be used, like count(*))
+Example:
+```
+Select("table1").
+		RawFields("count(*) as cnt", "item_id").
+		RawWhere("field1", "=", 5).
+		RawOrWhere("field2", "=", 5).
+		OrWhereGroup(func(w Where) {
+			w.OrNotIn("field3", 5, 8)
+			w.OrNotIn("field3", 3, 2)
+		}).
+		AsSQL()
 ```
 
 > Where can be used in any combination as in the select SQL shown, for update and delete SQLs as well.

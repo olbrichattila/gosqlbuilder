@@ -133,10 +133,15 @@ func (b *Build) getFieldList(fl []string) string {
 		if i > 0 {
 			strBuilder.WriteString(",")
 		}
-		builderConcat(
-			strBuilder,
-			b.fieldQuote, fn, b.fieldQuote,
-		)
+		if b.fieldsAreRaw {
+			builderConcat(strBuilder, fn)
+		} else {
+			builderConcat(
+				strBuilder,
+				b.fieldQuote, fn, b.fieldQuote,
+			)
+		}
+
 	}
 
 	return strBuilder.String()

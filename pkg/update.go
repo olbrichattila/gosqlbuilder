@@ -36,7 +36,7 @@ func (b *Build) generateUpdateSQL() (string, error) {
 		}
 		builderConcat(
 			builder,
-			b.fieldQuote, fn, b.fieldQuote, "=?",
+			b.fieldQuote, fn, b.fieldQuote, "=", b.getBindingParameter(),
 		)
 	}
 
