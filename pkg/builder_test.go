@@ -211,7 +211,7 @@ func (t *TestSuite) TestIn() {
 		AsSQL()
 
 	t.Nil(err)
-	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND `field2` IN (?,?,?) ")
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND `field2` IN (?,?,?)")
 
 	whereParams := builder.GetParams()
 	t.Len(whereParams, 4)
@@ -229,7 +229,7 @@ func (t *TestSuite) TestInWhereGroup() {
 		AsSQL()
 
 	t.Nil(err)
-	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND (`field2` IN (?,?)  AND `field2` IN (?,?) )")
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND (`field2` IN (?,?) AND `field2` IN (?,?))")
 
 	whereParams := builder.GetParams()
 	t.Len(whereParams, 5)
@@ -244,7 +244,7 @@ func (t *TestSuite) TestNotIn() {
 		AsSQL()
 
 	t.Nil(err)
-	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND `field2` NOT IN (?,?,?) ")
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND `field2` NOT IN (?,?,?)")
 
 	whereParams := builder.GetParams()
 	t.Len(whereParams, 4)
@@ -262,7 +262,7 @@ func (t *TestSuite) TestNotInWhereGroup() {
 		AsSQL()
 
 	t.Nil(err)
-	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND (`field2` NOT IN (?,?)  AND `field2` NOT IN (?,?) )")
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? AND (`field2` NOT IN (?,?) AND `field2` NOT IN (?,?))")
 
 	whereParams := builder.GetParams()
 	t.Len(whereParams, 5)
@@ -277,7 +277,7 @@ func (t *TestSuite) TestOrNotIn() {
 		AsSQL()
 
 	t.Nil(err)
-	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? OR `field2` NOT IN (?,?,?) ")
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? OR `field2` NOT IN (?,?,?)")
 
 	whereParams := builder.GetParams()
 	t.Len(whereParams, 4)
@@ -295,7 +295,7 @@ func (t *TestSuite) TestOrNotInWhereGroup() {
 		AsSQL()
 
 	t.Nil(err)
-	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? OR (`field2` NOT IN (?,?)  OR `field2` NOT IN (?,?) )")
+	t.Equal(sql, "SELECT * FROM `table1` WHERE `field1`=? OR (`field2` NOT IN (?,?) OR `field2` NOT IN (?,?))")
 
 	whereParams := builder.GetParams()
 	t.Len(whereParams, 5)
@@ -314,10 +314,27 @@ func (t *TestSuite) TestPostgresFlavour() {
 		AsSQL()
 
 	t.Nil(err)
-	t.Equal(sql, "SELECT * FROM \"table1\" WHERE \"field1\"=$1 OR (\"field2\" NOT IN ($2,$3)  OR \"field2\" NOT IN ($4,$5) )")
+	t.Equal(sql, "SELECT * FROM \"table1\" WHERE \"field1\"=$1 OR (\"field2\" NOT IN ($2,$3) OR \"field2\" NOT IN ($4,$5))")
 
 	whereParams := builder.GetParams()
 	t.Len(whereParams, 5)
+}
+
+func (t *TestSuite) TestPostgresFlavourWithInsert() {
+	builder := New()
+	builder.SetSQLFlavour(FlavourPgSQL)
+
+	sql, err := builder.
+		Insert("users").
+		Fields("name", "email", "password").
+		Values(1, 2, 3).
+		AsSQL()
+
+	t.Nil(err)
+	t.Equal(sql, "INSERT INTO \"users\" (\"name\",\"email\",\"password\") VALUES ($1,$2,$3)")
+
+	whereParams := builder.GetParams()
+	t.Len(whereParams, 3)
 }
 
 func (t *TestSuite) TestRawFields() {
@@ -333,7 +350,7 @@ func (t *TestSuite) TestRawFields() {
 		AsSQL()
 
 	t.Nil(err)
-	t.Equal(sql, "SELECT count(*) as cnt,item_id FROM `table1` WHERE `field1`=? OR (`field2` NOT IN (?,?)  OR `field2` NOT IN (?,?) )")
+	t.Equal(sql, "SELECT count(*) as cnt,item_id FROM `table1` WHERE `field1`=? OR (`field2` NOT IN (?,?) OR `field2` NOT IN (?,?))")
 
 	whereParams := builder.GetParams()
 	t.Len(whereParams, 5)
@@ -353,8 +370,8 @@ func (t *TestSuite) TestRawWhere() {
 		AsSQL()
 
 	t.Nil(err)
-	t.Equal(sql, "SELECT count(*) as cnt,item_id FROM `table1` WHERE field1=? OR field2=? OR (`field3` NOT IN (?,?)  OR `field3` NOT IN (?,?)")
+	t.Equal(sql, "SELECT count(*) as cnt,item_id FROM `table1` WHERE field1=? OR field2=? OR (`field3` NOT IN (?,?) OR `field3` NOT IN (?,?))")
 
 	whereParams := builder.GetParams()
-	t.Len(whereParams, 5)
+	t.Len(whereParams, 6)
 }

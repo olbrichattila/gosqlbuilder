@@ -173,6 +173,7 @@ func (b *Build) generateWhere(w Where) string {
 				)
 			}
 
+			itemValueCount := len(item.GetInValues())
 			switch item.GetOperator() {
 			case typeBetween, typeOrBetween:
 				strBuilder.WriteString(" BETWEEN ")
@@ -185,15 +186,23 @@ func (b *Build) generateWhere(w Where) string {
 			case typeIsNotNull, typeOrIsNotNull:
 				strBuilder.WriteString(" IS NOT NULL")
 			case typeIn, typeOrIn:
-				builderConcat(
-					strBuilder,
-					" IN (", b.getBindingParameter(), strings.Repeat(","+b.getBindingParameter(), len(item.GetInValues())-1), ") ",
-				)
+				strBuilder.WriteString(" IN (")
+				for i := 0; i < itemValueCount; i++ {
+					if i > 0 {
+						strBuilder.WriteString(",")
+					}
+					strBuilder.WriteString(b.getBindingParameter())
+				}
+				strBuilder.WriteString(")")
 			case typeNotIn, typeOrNotIn:
-				builderConcat(
-					strBuilder,
-					" NOT IN (", b.getBindingParameter(), strings.Repeat(","+b.getBindingParameter(), len(item.GetInValues())-1), ") ",
-				)
+				strBuilder.WriteString(" NOT IN (")
+				for i := 0; i < itemValueCount; i++ {
+					if i > 0 {
+						strBuilder.WriteString(",")
+					}
+					strBuilder.WriteString(b.getBindingParameter())
+				}
+				strBuilder.WriteString(")")
 			default:
 				builderConcat(
 					strBuilder,

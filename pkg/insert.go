@@ -40,6 +40,7 @@ func (b *Build) Values(values ...interface{}) Builder {
 
 func (b *Build) generateInsertSQL() (string, error) {
 	valueCount := len(b.values)
+
 	if len(b.fields) != valueCount {
 		return "", errFieldCountMismatch
 	}
@@ -54,10 +55,16 @@ func (b *Build) generateInsertSQL() (string, error) {
 		builder,
 		"INSERT INTO ", b.fieldQuote, b.tableName, b.fieldQuote,
 		" (", b.getSelectFields(), ")",
-		" VALUES (", b.getBindingParameter(),
-		strings.Repeat(","+b.getBindingParameter(), valueCount-1),
-		")",
+		" VALUES (",
 	)
+
+	for i := 0; i < valueCount; i++ {
+		if i > 0 {
+			builder.WriteString(",")
+		}
+		builder.WriteString(b.getBindingParameter())
+	}
+	builder.WriteString(")")
 
 	return builder.String(), nil
 }

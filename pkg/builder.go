@@ -162,10 +162,9 @@ func (b *Build) GetParams() []interface{} {
 }
 
 func (b *Build) getBindingParameter() string {
-	b.parameterCount++
-
 	if b.bindingStyle == "?" {
 		return b.bindingStyle
 	}
+	b.parameterCount++
 	return b.bindingStyle + strconv.Itoa(b.parameterCount)
 }
